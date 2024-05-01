@@ -1,3 +1,4 @@
+import { TokenSender } from './utils/sendToken';
 import { ActivationDto, LoginDto, RegisterDto } from './dto/user.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
@@ -124,9 +125,33 @@ export class UsersService {
   }
 
   async login(loginDto: LoginDto) {
-    const { name, password } = loginDto;
-    const user = { name, password };
-    return user;
+    const { email, password } = loginDto;
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (user && (await this.comparePassword(password, user.password))) {
+      const tokensender = new TokenSender(this.configService, this.jwtService);
+      return tokensender.sendToken(user);
+    } else {
+     return {
+      user: null,
+      accessToken: null,
+      refreshToken: null,
+      errror: {
+        message: "Invalid email or password !"
+      }
+     }
+    }
+  }
+
+  async comparePassword(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return await bcrypt.compare(password, hashedPassword);
   }
 
   // async activationUser(activationDto: ActivationDto, response: Response) {

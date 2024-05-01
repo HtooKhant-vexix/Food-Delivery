@@ -49,7 +49,7 @@ export class LoginDto {
   @Field()
   @IsNotEmpty({ message: 'Name is required.' })
   @IsString({ message: 'Name must need to be one string' })
-  name: string;
+  email: string;
 
   @Field()
   @IsNotEmpty({ message: 'Password is required.' })
