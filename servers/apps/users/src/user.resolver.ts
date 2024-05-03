@@ -4,11 +4,13 @@ import { UsersService } from './users.service';
 import {
   ActivationResponse,
   LoginResponse,
+  logoutResponse,
   RegisterResponse,
 } from './types/user.types';
 import { ActivationDto, RegisterDto } from './dto/user.dto';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, UseGuards } from '@nestjs/common';
 import { User } from './entities/user.entity';
+import { AuthGuard } from './guards/auth.guard';
 
 @Resolver('User')
 export class UsersResolver {
@@ -57,6 +59,20 @@ export class UsersResolver {
     @Args('password') password: string,
   ): Promise<LoginResponse> {
     return await this.usersService.login({ email, password });
+  }
+
+  @Query(() => LoginResponse)
+  @UseGuards(AuthGuard)
+  async getLoggedInUser(@Context() context: { req: Request }) {
+    // console.log(context.req, 'lllllllllllllllll');
+    return await this.usersService.getLoggedInUser(context.req);
+    // console.log(data, 'ddddddddddddddddddddddd');
+  }
+
+  @Query(() => logoutResponse)
+  @UseGuards(AuthGuard)
+  async logOutUser(@Context() context: { req: Request }) {
+    return await this.usersService.logout(context.req);
   }
 
   @Query(() => [User])

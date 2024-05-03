@@ -136,14 +136,14 @@ export class UsersService {
       const tokensender = new TokenSender(this.configService, this.jwtService);
       return tokensender.sendToken(user);
     } else {
-     return {
-      user: null,
-      accessToken: null,
-      refreshToken: null,
-      errror: {
-        message: "Invalid email or password !"
-      }
-     }
+      return {
+        user: null,
+        accessToken: null,
+        refreshToken: null,
+        errror: {
+          message: 'Invalid email or password !',
+        },
+      };
     }
   }
 
@@ -186,6 +186,20 @@ export class UsersService {
 
   //   return { activationToken, response };
   // }
+
+  async getLoggedInUser(req: any) {
+    const user = req.user;
+    const accessToken = req.accessToken;
+    const refreshToken = req.refreshToken;
+    return { user, accessToken, refreshToken }
+  }
+
+  async logout(req:any){
+    req.user = null;
+    req.accessToken = null;
+    req.refreshToken = null;
+    return {message: "Logouted successfully !"};
+  }
 
   async getHello() {
     return 'hello';
